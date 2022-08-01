@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.conf import settings
+from http import HTTPStatus
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.cache import cache
 
@@ -165,14 +166,14 @@ class PostsPagesTests(TestCase):
             author=self.user,
             post_id=self.post.id
         )
-        first_object = (self.client.post(self.posts_add_comment))
+        self.client.post(self.posts_add_comment)
         second_object = (self.client.get(self.posts_post_detail))
         self.assertContains(second_object, comment)
 
     def test_user_can_follow_to_author(self):
         """Тест: Авториз. польз. может подписаться на автора (posts)."""
         response = self.follower_client.get(self.posts_profile_follow)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertTrue(
             Follow.objects.filter(
                 user=self.follower,
@@ -184,7 +185,7 @@ class PostsPagesTests(TestCase):
         """Тест: Авториз. польз. может отписаться от автора (posts)."""
         self.follower_client.get(self.posts_profile_follow)
         response = self.follower_client.get(self.posts_profile_unfollow)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertFalse(
             Follow.objects.filter(
                 user=self.follower,
@@ -194,6 +195,15 @@ class PostsPagesTests(TestCase):
 
     def test_user_can_follow_to_himself(self):
         """Тест: Нельзя подписаться на себя (posts)."""
+        response = self.authorized_client.get(self.posts_profile_follow)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertTrue(
+            Follow.objects.filter(
+                user=self.follower,
+                author=self.post.author
+            ).exists()
+        )
+        assert self.user.follower.count() == 0
 
     def test_new_posts_in_follow_list(self):
         """Тест: Новый пост появл. в избранном подпис. польз. (posts)."""
