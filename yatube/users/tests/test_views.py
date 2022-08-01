@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
-from users.forms import CreationForm
+from ..forms import CreationForm
 
 User = get_user_model()
 
@@ -48,5 +48,3 @@ class TaskPagesTests(TestCase):
         response = self.authorized_client.get(reverse('users:signup'))
         first_object = response.context['form']
         self.assertIsInstance(first_object, CreationForm)
-
-

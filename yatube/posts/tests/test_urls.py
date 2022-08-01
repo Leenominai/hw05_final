@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from http import HTTPStatus
 
-from ..models import Post, Group, Follow
+from ..models import Post, Group
 
 User = get_user_model()
 
@@ -47,7 +47,7 @@ class TaskURLTests(TestCase):
             '/create/': HTTPStatus.OK,
             f'/posts/{self.post.id}/edit/': HTTPStatus.OK,
             f'/posts/{self.post.id}/comment/': HTTPStatus.FOUND,
-            f'/follow/': HTTPStatus.OK,
+            '/follow/': HTTPStatus.OK,
         }
         for url, status in url_status_code_access.items():
             with self.subTest(status=status):

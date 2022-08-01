@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from http import HTTPStatus
-from django.views.defaults import page_not_found, server_error
 
 
 User = get_user_model()

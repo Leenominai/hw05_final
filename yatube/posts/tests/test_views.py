@@ -212,7 +212,7 @@ class PostsPagesTests(TestCase):
         self.assertIn(self.post, context)
 
     def test_new_posts_not_in_follow_list(self):
-        """Тест: Новый пост не появл. в избранном от неподпис. польз. (posts)."""
+        """Тест: Новый пост не появл. в избр. от неподпис. польз. (posts)."""
         self.follower_client.get(self.posts_profile_unfollow)
         response = self.follower_client.get(self.posts_follow_index)
         context = response.context['page_obj'].object_list
