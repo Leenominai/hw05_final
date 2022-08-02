@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 
-
 User = get_user_model()
 POSTS_LIMIT: int = 10
 SYMBOLS_COUNT: int = 15
