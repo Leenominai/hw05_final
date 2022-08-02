@@ -2,9 +2,10 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 
+
 User = get_user_model()
-posts_limit: int = 10
-symbols_count: int = 15
+POSTS_LIMIT: int = 10
+SYMBOLS_COUNT: int = 15
 
 
 class Group(models.Model):
@@ -21,7 +22,6 @@ class Group(models.Model):
         help_text='Придумайте имя для group/*'
     )
     description = models.TextField(
-        max_length=400,
         verbose_name='Описание группы',
         help_text='Введите описание группы'
     )
@@ -46,7 +46,7 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         related_name='posts',
         verbose_name='Автор',
-        help_text='Выбор автора'
+        help_text='Выбор автора',
     )
     group = models.ForeignKey(
         Group,
@@ -55,13 +55,14 @@ class Post(models.Model):
         null=True,
         related_name='posts',
         verbose_name='Группа',
-        help_text='Группа, к которой будет относиться пост'
+        help_text='Группа, к которой будет относиться пост',
     )
     image = models.ImageField(
         verbose_name='Картинка',
         help_text='Добавьте вашу картинку',
         upload_to='posts/',
-        blank=True
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -70,7 +71,7 @@ class Post(models.Model):
         verbose_name_plural = 'Посты'
 
     def __str__(self):
-        return self.text[:symbols_count]
+        return self.text[:SYMBOLS_COUNT]
 
 
 class Comment(models.Model):
@@ -96,7 +97,7 @@ class Comment(models.Model):
     )
 
     def __str__(self):
-        return self.text[:symbols_count]
+        return self.text[:SYMBOLS_COUNT]
 
     class Meta:
         ordering = ['-pub_date']
@@ -113,3 +114,9 @@ class Follow(models.Model):
         on_delete=models.CASCADE,
         related_name='following'
     )
+
+    class Meta:
+        constraints = models.UniqueConstraint(
+            fields=['user', 'author'],
+            name='user_to_author_follow',
+        )

@@ -9,7 +9,7 @@ from http import HTTPStatus
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.cache import cache
 
-from ..models import Post, Group, Comment, Follow, posts_limit
+from ..models import Post, Group, Comment, Follow, POSTS_LIMIT
 from ..forms import PostForm
 
 
@@ -104,7 +104,9 @@ class PostsPagesTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_index_page_uses_correct_context(self):
-        """Проверка исп. правильного контекста index (posts)."""
+        """Тест контекста index (posts):
+        Проверка использования правильного контекста для функции index.
+        """
         response = self.authorized_client.get(self.posts_index)
         first_object = response.context['page_obj'][0]
         second_object = response.context.get('page_obj')[0].image
@@ -112,7 +114,9 @@ class PostsPagesTests(TestCase):
         self.assertEqual(second_object, self.post.image)
 
     def test_group_list_page_uses_correct_context(self):
-        """Проверка исп. правильного контекста group_list (posts)."""
+        """Тест контекста group_list (posts):
+        Проверка использования правильного контекста для функции group_list.
+        """
         response = self.authorized_client.get(self.posts_group_list)
         first_object = response.context['page_obj'][0]
         second_object = response.context['group']
@@ -122,7 +126,9 @@ class PostsPagesTests(TestCase):
         self.assertEqual(third_object, self.post.image)
 
     def test_profile_page_uses_correct_context(self):
-        """Проверка исп. правильного контекста profile (posts)."""
+        """Тест контекста profile (posts):
+        Проверка использования правильного контекста для функции profile.
+        """
         response = self.authorized_client.get(self.posts_profile)
         first_object = response.context['page_obj'][0]
         second_object = response.context['author']
@@ -132,7 +138,9 @@ class PostsPagesTests(TestCase):
         self.assertEqual(third_object, self.post.image)
 
     def test_post_detail_page_uses_correct_context(self):
-        """Проверка исп. правильного контекста post_detail (posts)."""
+        """Тест контекста post_detail (posts):
+        Проверка использования правильного контекста для функции post_detail.
+        """
         response = self.authorized_client.get(self.posts_post_detail)
         first_object = response.context['post']
         second_object = response.context.get('post').id
@@ -142,13 +150,17 @@ class PostsPagesTests(TestCase):
         self.assertEqual(third_object, self.post.image)
 
     def test_create_post_page_uses_correct_context(self):
-        """Проверка исп. правильного контекста create_post (posts)."""
+        """Тест контекста create_post (posts):
+        Проверка использования правильного контекста для функции create_post.
+        """
         response = self.authorized_client.get(self.posts_post_create)
         first_object = response.context['form']
         self.assertIsInstance(first_object, PostForm)
 
     def test_post_edit_page_uses_correct_context(self):
-        """Проверка исп. правильного контекста post_edit (posts)."""
+        """Тест контекста post_edit (posts):
+        Проверка использования правильного контекста для функции post_edit.
+        """
         response = self.authorized_client.get(self.posts_post_edit)
         first_object = response.context['form']
         second_object = response.context['post']
@@ -160,7 +172,9 @@ class PostsPagesTests(TestCase):
         self.assertTrue(fourth_object)
 
     def test_comment_post_auth_user(self):
-        """Тест: добавление комментария авториз. польз. (posts)"""
+        """Тест нового комментария (posts):
+        Проверка добавления нового комментария авторизованным  пользователем.
+        """
         comment = Comment.objects.create(
             text='Новый комментарий',
             author=self.user,
@@ -171,7 +185,9 @@ class PostsPagesTests(TestCase):
         self.assertContains(second_object, comment)
 
     def test_user_can_follow_to_author(self):
-        """Тест: Авториз. польз. может подписаться на автора (posts)."""
+        """Тест подписки на автора (posts):
+        Проверка возможности подписки авторизованного пользователя на автора.
+        """
         response = self.follower_client.get(self.posts_profile_follow)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertTrue(
@@ -182,7 +198,9 @@ class PostsPagesTests(TestCase):
         )
 
     def test_follower_can_unfollow_from_author(self):
-        """Тест: Авториз. польз. может отписаться от автора (posts)."""
+        """Тест отписки от автора (posts):
+        Проверка возможности отписки авторизованного пользователя от автора.
+        """
         self.follower_client.get(self.posts_profile_follow)
         response = self.follower_client.get(self.posts_profile_unfollow)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
@@ -206,13 +224,19 @@ class PostsPagesTests(TestCase):
         assert self.user.follower.count() == 0
 
     def test_new_posts_in_follow_list(self):
-        """Тест: Новый пост появл. в избранном подпис. польз. (posts)."""
+        """Тест появления нового поста у подписанных пользователей (posts).
+        Проверка появления новой записи пользователя в ленте тех,
+        кто на него подписан.
+        """
         response = self.follower_client.get(self.posts_follow_index)
         context = response.context['page_obj'].object_list
         self.assertIn(self.post, context)
 
     def test_new_posts_not_in_follow_list(self):
-        """Тест: Новый пост не появл. в избр. от неподпис. польз. (posts)."""
+        """Тест отсутствия нового поста у неподписанных пользователей (posts).
+        Проверка отсутствия появления новой записи пользователя в ленте тех,
+        кто на него не подписан.
+        """
         self.follower_client.get(self.posts_profile_unfollow)
         response = self.follower_client.get(self.posts_follow_index)
         context = response.context['page_obj'].object_list
@@ -260,26 +284,24 @@ class PaginatorViewsTest(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_index_first_page_contains_ten_records(self):
-        """Проверка: количество постов на первой странице index равно 10"""
+        """Проверка: количество постов на 1 странице index равно 10"""
         response = self.client.get(reverse('posts:index'))
-        self.assertEqual(len(response.context['page_obj']), posts_limit)
+        self.assertEqual(len(response.context['page_obj']), POSTS_LIMIT)
 
     def test_index_second_page_contains_three_records(self):
-        """Проверка: на второй странице Index должно быть три поста"""
+        """Проверка: на 2 странице Index должно быть три поста"""
         response = self.client.get(reverse('posts:index') + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_group_list_first_page_contains_ten_records(self):
-        """Проверка: количество постов
-        на первой странице group_list равно 10
-        """
+        """Проверка: количество постов на 1 странице group_list равно 10"""
         response = self.client.get(
             reverse('posts:group_list', kwargs={'slug': self.group.slug})
         )
-        self.assertEqual(len(response.context['page_obj']), posts_limit)
+        self.assertEqual(len(response.context['page_obj']), POSTS_LIMIT)
 
     def test_group_list_second_page_contains_three_records(self):
-        """Проверка: на второй странице group_list должно быть три поста"""
+        """Проверка: на 2 странице group_list должно быть три поста"""
         response = self.client.get(
             reverse('posts:group_list', kwargs={'slug': self.group.slug})
             + '?page=2'
@@ -287,14 +309,14 @@ class PaginatorViewsTest(TestCase):
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_profile_first_page_contains_ten_records(self):
-        """Проверка: количество постов на первой странице profile равно 10"""
+        """Проверка: количество постов на 1 странице profile равно 10"""
         response = self.client.get(
             reverse('posts:profile', kwargs={'username': self.user})
         )
-        self.assertEqual(len(response.context['page_obj']), posts_limit)
+        self.assertEqual(len(response.context['page_obj']), POSTS_LIMIT)
 
     def test_profile_second_page_contains_three_records(self):
-        """Проверка: на второй странице profile должно быть три поста"""
+        """Проверка: на 2 странице profile должно быть три поста"""
         response = self.client.get(
             reverse('posts:profile', kwargs={'username': self.user})
             + '?page=2'

@@ -55,7 +55,9 @@ class TaskURLTests(TestCase):
                 self.assertEqual(response.status_code, status)
 
     def test_url_redirect_no_author_from_edit_any_post_to_that_post(self):
-        """Тест: При попытке неавтора ред. пост, редир. на тот пост (posts)"""
+        """Тест попытки редактирования неавтором (posts):
+        При попытке неавтора редактировать пост,
+        происходит редирект на тот пост."""
         if self.user != self.post.author:
             url_redirects = {
                 f'/posts/{self.post.id}/edit/': f'/posts/{self.post.id}/',
@@ -66,7 +68,10 @@ class TaskURLTests(TestCase):
                     self.assertRedirects(response, redirect_url)
 
     def test_url_redirect_anonymous_on_admin_login(self):
-        """Страница перенаправит анонимного польз. страницу логина (posts)"""
+        """Тест редиректа анонимного пользователя (posts):
+        При попытке создать пост, страница перенаправит анонимного
+        пользователя на страницу логина.
+        """
         url_redirects = {
             '/create/': '/auth/login/?next=' + '/create/',
             f'/posts/{self.post.id}/comment/':

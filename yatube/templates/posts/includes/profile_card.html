@@ -1,0 +1,24 @@
+<h2>Автор: {{ author.get_full_name }}</h2>
+<h4>Все посты пользователя</h4>
+<h5>Всего постов: {{ author.posts.count }} </h5>
+<h5>Подписано на автора: {{ author.following.count }}</h5>
+<h5>Своих подписок: {{ author.follow.count }}</h5>
+{% if user.is_authenticated %}
+  {% if request.user !=  author %}
+    {% if following == True %}
+      <a
+        class="btn btn-lg btn-light"
+        href="{% url 'posts:profile_unfollow' author.username %}" role="button"
+      >
+        Отписаться
+      </a>
+    {% else %}
+      <a
+        class="btn btn-lg btn-primary"
+        href="{% url 'posts:profile_follow' author.username %}" role="button"
+      >
+        Подписаться
+      </a>
+    {% endif %}
+  {% endif %}
+{% endif %}

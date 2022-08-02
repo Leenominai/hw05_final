@@ -6,12 +6,16 @@
 
 {% block content %}
   <div class="container py-5">
-    <h2>Все посты пользователя {{ author.get_full_name }}</h2>
-    <h4>Всего постов: {{ author.posts.count }} </h4>
-      {% include 'posts/includes/follow_unfollow.html' %}
-      {% for post in page_obj %}
-        {% include 'posts/includes/post_profile.html' %}
-      {% endfor %}
-    {% include 'posts/includes/paginator.html' %}
+    <div class="row">
+      <div class="col-md-3 mb-3">
+          {% include 'posts/includes/profile_card.html' %}
+      </div>
+      <div class="col-md-9">
+          {% for post in page_obj %}
+            {% include 'posts/includes/post_profile.html' %}
+          {% endfor %}
+        {% include 'posts/includes/paginator.html' %}
+      </div>
+    </div>
   </div>
 {% endblock %}

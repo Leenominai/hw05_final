@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from ..models import Group, Post, Comment, symbols_count
+from ..models import Group, Post, Comment, SYMBOLS_COUNT
 
 User = get_user_model()
 
@@ -28,7 +28,9 @@ class PostModelTest(TestCase):
         )
 
     def test_verbose_name(self):
-        """Проверяем, что verbose_name в полях Post совпадает с ожидаемым."""
+        """Тест verbose_name в models (posts):
+        Проверяем, что verbose_name в полях Post совпадает с ожидаемым.
+        """
         task = PostModelTest.post
         field_verboses = {
             'text': 'Текст поста',
@@ -42,7 +44,8 @@ class PostModelTest(TestCase):
                     task._meta.get_field(field).verbose_name, expected_value)
 
     def test_help_text(self):
-        """Проверяем, что help_text в полях Post совпадает с ожидаемым."""
+        """Тест help_text в model Post (posts):
+        Проверяем, что help_text в полях Post совпадает с ожидаемым."""
         task = PostModelTest.post
         field_help_texts = {
             'text': 'Введите текст поста',
@@ -55,14 +58,15 @@ class PostModelTest(TestCase):
                     task._meta.get_field(value).help_text, expected)
 
     def test_models_have_correct_object_names(self):
-        """Проверяем, что у моделей корректно работает __str__."""
+        """Тест __str__ в model Post (posts):
+        Проверяем, что у моделей корректно работает __str__."""
         post_check_str = str(PostModelTest.post)
         group_check_str = str(PostModelTest.group)
         comment_check_str = str(PostModelTest.comment)
         task_list = {
-            post_check_str: self.post.text[:symbols_count],
+            post_check_str: self.post.text[:SYMBOLS_COUNT],
             group_check_str: self.group.title,
-            comment_check_str: self.comment.text[:symbols_count]
+            comment_check_str: self.comment.text[:SYMBOLS_COUNT]
         }
         for task, value in task_list.items():
             with self.subTest(task=task):
@@ -80,7 +84,8 @@ class GroupModelTest(TestCase):
         )
 
     def test_verbose_name(self):
-        """Проверяем, что verbose_name в полях Group совпадает с ожидаемым."""
+        """Тест verbose_name в model Group (posts):
+        Проверяем, что verbose_name в полях Group совпадает с ожидаемым."""
         task = GroupModelTest.group
         field_verboses = {
             'title': 'Название группы',
@@ -93,7 +98,8 @@ class GroupModelTest(TestCase):
                     task._meta.get_field(field).verbose_name, expected_value)
 
     def test_help_text(self):
-        """Проверяем, что help_text в полях Group совпадает с ожидаемым."""
+        """Тест help_text в model Group (posts):
+        Проверяем, что help_text в полях Group совпадает с ожидаемым."""
         task = GroupModelTest.group
         field_help_texts = {
             'title': 'Введите название',
@@ -123,7 +129,8 @@ class CommentModelTest(TestCase):
         )
 
     def test_verbose_name(self):
-        """Проверяем, что verbose_name в полях Group совпадает с ожидаемым."""
+        """Тест verbose_name в model Comment (posts):
+        Проверяем, что verbose_name в полях Comment совпадает с ожидаемым."""
         task = CommentModelTest.comment
         field_verboses = {
             'author': 'Автор комментария',
@@ -136,7 +143,8 @@ class CommentModelTest(TestCase):
                     task._meta.get_field(field).verbose_name, expected_value)
 
     def test_help_text(self):
-        """Проверяем, что help_text в полях Group совпадает с ожидаемым."""
+        """Тест help_text в model Comment (posts):
+        Проверяем, что help_text в полях Comment совпадает с ожидаемым."""
         task = CommentModelTest.comment
         field_help_texts = {
             'text': 'Добавьте Ваш комментарий',

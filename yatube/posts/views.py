@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Post, Group, User, Comment, Follow, posts_limit
+from .models import Post, Group, User, Follow, POSTS_LIMIT
 from .forms import PostForm, CommentForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 
 
 def get_paginator(queryset, request):
-    paginator = Paginator(queryset, posts_limit)
+    paginator = Paginator(queryset, POSTS_LIMIT)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return page_obj
@@ -30,7 +30,7 @@ def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.all()
-    page_obj = get_paginator(group.posts.all(), request)
+    page_obj = get_paginator(posts.all(), request)
     context = {
         'group': group,
         'posts': posts,
@@ -44,9 +44,15 @@ def profile(request, username):
     template = 'posts/profile.html'
     author = get_object_or_404(User, username=username)
     page_obj = get_paginator(author.posts.all(), request)
+    following = (
+            request.user.is_authenticated
+            and Follow.objects.filter(
+                user=request.user, author=author
+                ).exists())
     context = {
         'author': author,
         'page_obj': page_obj,
+        'following': following,
     }
     return render(request, template, context)
 
@@ -55,12 +61,10 @@ def post_detail(request, post_id):
     """Страница поста"""
     template = 'posts/post_detail.html'
     post = get_object_or_404(Post, pk=post_id)
-    count = post.author.posts.all().count()
     form = CommentForm(request.POST or None)
-    comments = Comment.objects.select_related('post').filter(post=post)
+    comments = post.comments.all()
     context = {
         'post': post,
-        'count': count,
         'form': form,
         'comments': comments,
     }
@@ -128,7 +132,7 @@ def follow_index(request):
     template = 'posts/follow.html'
     title = 'Подписки на авторов'
     author_posts = Post.objects.filter(author__following__user=request.user)
-    page_obj = get_paginator(author_posts.all(), request)
+    page_obj = get_paginator(author_posts, request)
     context = {
         'title': title,
         'page_obj': page_obj,
@@ -148,6 +152,5 @@ def profile_follow(request, username):
 @login_required
 def profile_unfollow(request, username):
     """Отписка от автора"""
-    author = get_object_or_404(User, username=username)
-    Follow.objects.get(user=request.user, author=author).delete()
+    Follow.objects.filter(author__username=username).delete()
     return redirect('posts:profile', username=username)

@@ -2,12 +2,12 @@
 
 {% load static %}
 
+{% load cache %}
+{% cache 20 index %}
+
 {% block title %}
     {{ title }}
 {% endblock %}
-
-{% load cache %}
-{% cache 20 index %}
 
 {% block content %}
   <div class="container py-5">

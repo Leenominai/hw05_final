@@ -8,8 +8,8 @@ from django.conf import settings
 from http import HTTPStatus
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from posts.models import Post, Group, Comment
-from posts.forms import PostForm
+from ..models import Post, Group, Comment
+from ..forms import PostForm
 
 
 User = get_user_model()
@@ -49,7 +49,9 @@ class PostFormTests(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_create_post(self):
-        """Тест: после создания поста создаётся новая запись в БД (posts)."""
+        """Тест записи поста в БД (posts):
+        после создания поста создаётся новая запись в БД.
+        """
         posts_count = Post.objects.count()
         form_data = {
             'text': self.post.text,
@@ -71,7 +73,9 @@ class PostFormTests(TestCase):
         )
 
     def test_edit_post(self):
-        """Тест: после изменения поста изменяется его записьв БД (posts)."""
+        """Тест изменения поста в БД (posts):
+        после изменения поста изменяется его запись в БД.
+        """
         post = Post.objects.create(
             author=self.user,
             text=self.post.text,
@@ -94,7 +98,9 @@ class PostFormTests(TestCase):
         self.assertRedirects(response, f'/posts/{post.id}/')
 
     def test_create_post_with_a_pic(self):
-        """Тест: после созд. c поста с карт. созд. нов. зап. в БД (posts)."""
+        """Тест создания поста с картинкой (posts):
+        после создания поста с картинкой создаётся новая запись в БД.
+        """
         posts_count = Post.objects.count()
         uploaded = SimpleUploadedFile(
             name='small.gif',
