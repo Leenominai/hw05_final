@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from http import HTTPStatus
+from django.core.cache import cache
 
 from ..models import Post, Group
 
@@ -26,6 +27,7 @@ class TaskURLTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        cache.clear()
 
     def test_all_users_access_url(self):
         """Тестирование общедоступных страниц (posts)."""

@@ -3,6 +3,7 @@ from .models import Post, Group, User, Follow, POSTS_LIMIT
 from .forms import PostForm, CommentForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import cache_page
 
 
 def get_paginator(queryset, request):
@@ -12,6 +13,7 @@ def get_paginator(queryset, request):
     return page_obj
 
 
+@cache_page(20)
 def index(request):
     """Главная страница"""
     template = 'posts/index.html'

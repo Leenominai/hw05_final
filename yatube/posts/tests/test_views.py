@@ -86,6 +86,7 @@ class PostsPagesTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.follower_client = Client()
         self.follower_client.force_login(self.follower)
+        cache.clear()
 
     def test_pages_uses_correct_template(self):
         """Проверка вызываемых шаблонов для каждой view-функции (posts)."""
@@ -244,17 +245,16 @@ class PostsPagesTests(TestCase):
 
     def test_cache_index_page(self):
         """Проверяем что главная страница кешируется на 20 секунд."""
-        response = self.authorized_client.get(self.posts_index)
-        new_post = Post.objects.create(
-            text='Кешированный текст',
+        response_one = self.authorized_client.get(self.posts_index)
+        Post.objects.create(
+            text='Текст тестировки кэша',
             author=self.user,
         )
-        cache.set('index_page', response.content)
-        self.assertEqual(response.content, cache.get('index_page'))
-        new_post.delete()
-        self.assertEqual(response.content, cache.get('index_page'))
+        response_two = self.authorized_client.get(self.posts_index)
+        self.assertEqual(response_one.content, response_two.content)
         cache.clear()
-        self.assertNotEqual(response.content, cache.get('index_page'))
+        response_three = self.authorized_client.get(self.posts_index)
+        self.assertNotEqual(response_one.content, response_three.content)
 
 
 class PaginatorViewsTest(TestCase):
@@ -282,6 +282,7 @@ class PaginatorViewsTest(TestCase):
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        cache.clear()
 
     def test_index_first_page_contains_ten_records(self):
         """Проверка: количество постов на 1 странице index равно 10"""
